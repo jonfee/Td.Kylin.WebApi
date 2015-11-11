@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0-*",
+  "description": "Td.Kylin.WebApi Class Library",
+  "authors": [ "hibru" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "dnx451": { },
+    "dnxcore50": {
+    }
+  },
+  "dependencies": {
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-beta8",
+    "Td.AspNet.Utils": "1.0.0.2"
+  }
+}
