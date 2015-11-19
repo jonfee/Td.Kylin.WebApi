@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNet.Builder;
-using Microsoft.Framework.Configuration;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;

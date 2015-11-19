@@ -63,12 +63,16 @@ namespace Td.Kylin.WebApi.Filters
                 context.Result = Message(4, "授权未通过", "非法访问，授权未通过");
                 return;
             }
-            if ((Role)moduleInfo.Role != Role.Admin)
+            if (Code != 0)
             {
-                if (((Role)moduleInfo.Role & Code) != (Role)moduleInfo.Role)
+                if ((Role)moduleInfo.Role != Role.Admin)
                 {
-                    context.Result = Message(5, "授权未通过", "模块权限不够，不允许进行操作");
-                    return;
+
+                    if (((Role)moduleInfo.Role & Code) != (Role)moduleInfo.Role)
+                    {
+                        context.Result = Message(5, "授权未通过", "模块权限不够，不允许进行操作");
+                        return;
+                    }
                 }
             }
 
@@ -110,9 +114,9 @@ namespace Td.Kylin.WebApi.Filters
         public IActionResult Message(int code, string message, string content)
         {
             var msg = new ErrorMessage();
-            msg.Code = 1;
-            msg.Content = "URL参数缺失";
-            msg.Message = "参数缺失";
+            msg.Code = code;
+            msg.Content = content;
+            msg.Message = message;
             return ActionMessage.Ok(msg);
         }
     }

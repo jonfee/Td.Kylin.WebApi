@@ -15,7 +15,7 @@ namespace Td.Kylin.WebApi.Website.WebApi
     {
         // GET: api/values
         [HttpGet]
-        [ApiAuthorization(Code = Role.Admin | Role.Use)]
+        [ApiAuthorization]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
