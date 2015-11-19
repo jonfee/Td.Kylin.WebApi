@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Td.Kylin.WebApi.Models;
 using Td.Kylin.WebApi.Filters;
+using Td.Kylin.WebApi.Website.Models;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,8 +31,10 @@ namespace Td.Kylin.WebApi.Website.WebApi
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        [ApiAuthorization(Code = Role.Admin)]
+        public string Post(Users value)
         {
+            return value.Password;
         }
 
         // PUT api/values/5
