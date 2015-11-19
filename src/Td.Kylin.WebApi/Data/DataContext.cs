@@ -5,9 +5,9 @@ namespace Td.Kylin.WebApi.Data
 {
     public class DataContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            optionsBuilder.UseSqlServer(WebApiConfig.Configuration["Data:APIConnectionString"]);
+            options.UseSqlServer(WebApiConfig.Configuration["Data:APIConnectionString"]);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
