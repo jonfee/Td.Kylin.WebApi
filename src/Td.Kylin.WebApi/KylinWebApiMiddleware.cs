@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Td.Kylin.WebApi.Website
+namespace Td.Kylin.WebApi
 {
     public class KylinWebApiMiddleware
     {
