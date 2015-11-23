@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Filters;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,16 @@ namespace Td.Kylin.WebApi.Filters
                 return;
             }
 
-            var moduleInfo = ModuleAuthorizeCache.GetSecret(PartnerId);
+            var moduleInfo = new System_ModuleAuthorize();
+            try
+            {
+                moduleInfo = ModuleAuthorizeCache.GetSecret(PartnerId);
+            }
+            catch (Exception ex)
+            {
+                context.Result = Message(4, "获取模块授权异常", ex.Message);
+                return;
+            }
             var secret = moduleInfo.AppSecret;
             if (string.IsNullOrEmpty(moduleInfo.AppSecret))
             {
@@ -79,11 +89,18 @@ namespace Td.Kylin.WebApi.Filters
             if (method == "POST")
             {
                 queryDic.Remove("Sign");
-                var data = request.Form;
-                var dic = new Dictionary<string, string>();
-                foreach (var item in data)
+                try {
+                    var data = request.Form;
+                    var dic = new Dictionary<string, string>();
+                    foreach (var item in data)
+                    {
+                        queryDic.Add(item.Key, item.Value[0]);
+                    }
+                }
+                catch(Exception ex)
                 {
-                    queryDic.Add(item.Key, item.Value[0]);
+                    context.Result = Message(12, "数据异常", "request.Form 获取表单数据异常");
+                    return;
                 }
                 var s = Strings.SignRequest(queryDic, secret);
                 if (Sign != s)
