@@ -20,8 +20,8 @@ namespace Td.Kylin.WebApi.Website.Controllers
             //user.Password = Strings.PasswordEncrypt("admin");
             //dic = DicMapper.ToMap(user);
             //var txt = DefaultClient.DoPost("http://localhost:36177/api/values", dic, "A0001", "8C44B1F5-CC25-46C9-AA1E-BB2BB0123E66").Result;
-            //var txt = DefaultClient.DoGet("http://localhost:36177/api/values", dic, "A0001", "8C44B1F5-CC25-46C9-AA1E-BB2BB0123E66").Result;
-            var txt = DefaultClient.DoGet("http://localhost:2025/v1/admin/1", dic, "A0001", "8C44B1F5-CC25-46C9-AA1E-BB2BB0123E66").Result;
+            var txt = DefaultClient.DoGet("http://localhost:36177/api/values", dic, "A0001", "8C44B1F5-CC25-46C9-AA1E-BB2BB0123E66").Result;
+            //var txt = DefaultClient.DoGet("http://localhost:2025/v1/admin/1", dic, "A0001", "8C44B1F5-CC25-46C9-AA1E-BB2BB0123E66").Result;
             ViewBag.Txt = txt;
             return View();
         }

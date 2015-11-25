@@ -67,6 +67,11 @@ namespace Td.Kylin.WebApi.Filters
                 context.Result = Message(4, "获取模块授权异常", ex.Message);
                 return;
             }
+            if(moduleInfo == null)
+            {
+                context.Result = Message(4, "获取模块授权异常", "模块授权信息不存在");
+                return;
+            }
             var secret = moduleInfo.AppSecret;
             if (string.IsNullOrEmpty(moduleInfo.AppSecret))
             {
