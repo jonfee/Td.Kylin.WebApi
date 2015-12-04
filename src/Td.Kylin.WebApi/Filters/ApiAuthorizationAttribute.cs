@@ -41,7 +41,9 @@ namespace Td.Kylin.WebApi.Filters
                 }
                 if (item.Key == "Timestamp")
                 {
-                    Timestamp = DateTime.Parse(item.Value);
+                    long ticks = 0;
+                    long.TryParse(item.Value, out ticks);
+                    Timestamp = DateTime.FromBinary(ticks);
                 }
             }
 
@@ -51,7 +53,8 @@ namespace Td.Kylin.WebApi.Filters
                 return;
             }
 
-            if (Timestamp.AddMinutes(5) < DateTime.Now)
+            //采用协调世界时进行校验（接口请求时同样采用协调世界时处理）
+            if (Timestamp.AddMinutes(5) < DateTime.Now.ToUniversalTime())
             {
                 context.Result = Message(3, "服务过期", "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
                 return;
@@ -67,7 +70,7 @@ namespace Td.Kylin.WebApi.Filters
                 context.Result = Message(4, "获取模块授权异常", ex.Message);
                 return;
             }
-            if(moduleInfo == null)
+            if (moduleInfo == null)
             {
                 context.Result = Message(4, "获取模块授权异常", "模块授权信息不存在");
                 return;
@@ -94,7 +97,8 @@ namespace Td.Kylin.WebApi.Filters
             if (method == "POST")
             {
                 queryDic.Remove("Sign");
-                try {
+                try
+                {
                     var data = request.Form;
                     var dic = new Dictionary<string, string>();
                     foreach (var item in data)
@@ -102,7 +106,7 @@ namespace Td.Kylin.WebApi.Filters
                         queryDic.Add(item.Key, item.Value[0]);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     context.Result = Message(12, "数据异常", "request.Form 获取表单数据异常");
                     return;
