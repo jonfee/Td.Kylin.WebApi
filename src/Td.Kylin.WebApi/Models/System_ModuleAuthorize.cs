@@ -25,7 +25,7 @@ namespace Td.Kylin.WebApi.Models
         /// <summary>
         /// 角色
         /// </summary>
-        public byte Role { get; set; }
+        public int Role { get; set; }
 
         /// <summary>
         /// 建立时间
