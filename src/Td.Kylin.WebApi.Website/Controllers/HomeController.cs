@@ -14,6 +14,7 @@ namespace Td.Kylin.WebApi.Website.Controllers
         public IActionResult Index()
         {
             var dic = new Dictionary<string, string>();
+            dic.Add("ID", "天道新创");
             //Users user = new Users();
             //user.UserId = 1;
             //user.Name = "Test";
