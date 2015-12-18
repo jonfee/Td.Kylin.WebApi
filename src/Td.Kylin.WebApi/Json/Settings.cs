@@ -25,7 +25,7 @@ namespace Td.Kylin.WebApi.Json
                 SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
 
                 //空值处理
-                SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                //SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
                 SerializerSettings.Converters.Add(new Int64Convert());
 
