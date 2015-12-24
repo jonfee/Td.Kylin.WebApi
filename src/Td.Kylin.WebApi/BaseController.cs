@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 using Td.Kylin.WebApi.Json;
 
@@ -17,9 +18,23 @@ namespace Td.Kylin.WebApi
         /// <returns></returns>
         public IActionResult KylinOk(object obj)
         {
-            var data = JsonConvert.SerializeObject(obj, Formatting.Indented, Settings.SerializerSettings);
+            if(null== obj)
+            {
+                return Ok("null");
+            }
 
-            return Ok(data);
+            var type = obj.GetType();
+
+            if (type == typeof(string))
+            {
+                return Ok(obj);
+            }
+            else
+            {
+                var data = JsonConvert.SerializeObject(obj, Formatting.Indented, Settings.SerializerSettings);
+
+                return Ok(data);
+            }
         }
     }
 }

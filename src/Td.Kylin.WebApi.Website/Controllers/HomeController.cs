@@ -9,7 +9,7 @@ using Td.AspNet.Utils;
 
 namespace Td.Kylin.WebApi.Website.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public IActionResult Index()
         {
@@ -25,6 +25,11 @@ namespace Td.Kylin.WebApi.Website.Controllers
             //var txt = DefaultClient.DoGet("http://localhost:2025/v1/admin/1", dic, "A0001", "8C44B1F5-CC25-46C9-AA1E-BB2BB0123E66").Result;
             ViewBag.Txt = txt;
             return View();
+        }
+
+        public IActionResult StringResult()
+        {
+            return KylinOk("这是字符串");
         }
 
         public IActionResult About()
