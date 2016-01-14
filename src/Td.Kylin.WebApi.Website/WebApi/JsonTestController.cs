@@ -35,6 +35,24 @@ namespace Td.Kylin.WebApi.Website.WebApi
             return KylinOk(model);
         }
 
+        [HttpGet("html")]
+        public IActionResult HtmlString()
+        {
+            TestNullableModel model = new TestNullableModel
+            {
+                Name = "测试",
+                ItemID = long.MaxValue,
+                Content = @"<h1 style=""font - size:16px; font - family:arial, 'microsoft yahei'; color:#666666;background-color:#FFFFFF;"">
+	鸿星尔克男鞋冬季运动鞋男跑步鞋男款跑鞋男慢跑鞋子 正黑 41
+</ h1 >
+< div id = ""p-ad"" class=""p-ad J-ad-1629975686"" style=""margin:0px;padding:0px;font-family:arial, 'microsoft yahei';color:#E3393C;font-size:14px;background-color:#FFFFFF;"">
+	拍下只要175元2015冬季新品，支持货到付款。
+</div>"
+            };
+
+            return KylinOk(model);
+        }
+
         public class TestModel
         {
             public string Name { get; set; }
@@ -47,6 +65,8 @@ namespace Td.Kylin.WebApi.Website.WebApi
             public string Name { get; set; }
 
             public long? ItemID { get; set; }
+
+            public string Content { get; set; }
         }
     }
 }

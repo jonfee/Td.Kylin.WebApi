@@ -25,6 +25,8 @@ namespace Td.Kylin.WebApi.Json
 
                 SerializerSettings.Converters.Add(new Int64Convert());
 
+                SerializerSettings.Converters.Add(new StringConvert());
+
                 return SerializerSettings;
             });
         }

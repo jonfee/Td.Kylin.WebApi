@@ -102,3 +102,16 @@ Test:@ViewBag.Txt
         </ul>
     </div>
 </div>
+
+<script type="text/javascript">
+    jQuery(function ($) {
+        $.ajax({
+            url: "http://localhost:36177/api/jsontest/html",
+            data: null,
+            dataType: "get",
+            success: function (data) {
+                var json = data;
+            }
+        });
+    });
+</script>

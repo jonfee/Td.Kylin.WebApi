@@ -4,7 +4,7 @@ using System;
 namespace Td.Kylin.WebApi.Json
 {
     /// <summary>
-    /// 长整型转换
+    /// 长整型在JSON中的处理
     /// </summary>
     public class Int64Convert : JsonConverter
     {
