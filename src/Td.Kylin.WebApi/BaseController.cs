@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
-using System;
-using System.Threading.Tasks;
 using Td.Kylin.WebApi.Json;
 
 namespace Td.Kylin.WebApi
@@ -18,7 +16,7 @@ namespace Td.Kylin.WebApi
         /// <returns></returns>
         public IActionResult KylinOk(object obj)
         {
-            if(null== obj)
+            if (null == obj)
             {
                 return Ok("null");
             }
@@ -35,6 +33,28 @@ namespace Td.Kylin.WebApi
 
                 return Ok(data);
             }
+        }
+
+        /// <summary>
+        /// Kylin使用的HttpOkObjectResult结果返回
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="code"></param>
+        /// <param name="message"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public IActionResult KylinOk<T>(int code, string message, T result)
+        {
+            ApiResult<T> apiResult = new ApiResult<T>
+            {
+                Code = code,
+                Message = message,
+                Result = result
+            };
+
+            string data = JsonConvert.SerializeObject(apiResult, Formatting.Indented, Settings.SerializerSettings);
+
+            return Ok(data);
         }
     }
 }
