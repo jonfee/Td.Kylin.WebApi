@@ -19,6 +19,6 @@
         /// <summary>
         /// 期望结果
         /// </summary>
-        public T Result { get; set; }
+        public T Content { get; set; }
     }
 }
