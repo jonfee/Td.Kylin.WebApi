@@ -7,7 +7,7 @@ namespace Td.Kylin.WebApi.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer(WebApiConfig.Configuration["Data:APIConnectionString"]);
+            options.UseNpgsql(WebApiConfig.Configuration["Data:APIConnectionString"]);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

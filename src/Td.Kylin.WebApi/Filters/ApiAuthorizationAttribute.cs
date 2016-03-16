@@ -135,6 +135,22 @@ namespace Td.Kylin.WebApi.Filters
                 return;
             }
 
+            SetRequestContext(context.HttpContext, queryDic);
+        }
+
+        void SetRequestContext(HttpContext context, IDictionary<string, string> queryDic)
+         {
+            foreach (var item in queryDic)
+            {
+                if (item.Key == "Longitude")
+                {
+                    context.Items.Add("Longitude", item.Value);
+                }
+                if (item.Key == "Latitude")
+                {
+                    context.Items.Add("Latitude", item.Value);
+                }
+            }
         }
 
         public IActionResult Message(int code, string message, string content)

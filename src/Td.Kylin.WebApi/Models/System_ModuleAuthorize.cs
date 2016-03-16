@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,5 +37,11 @@ namespace Td.Kylin.WebApi.Models
         /// 更新时间
         /// </summary>
         public DateTime UpdateTime { get; set; }
+
+        /// <summary>
+        /// 行版本
+        /// </summary>
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }

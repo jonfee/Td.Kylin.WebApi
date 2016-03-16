@@ -17,9 +17,11 @@ namespace Td.Kylin.WebApi.Website.WebApi
         // GET: api/values
         [HttpGet]
         [ApiAuthorization]
-        public IEnumerable<string> Get()
+        public IEnumerable<object> Get()
         {
-            return new string[] { "value1", "value2" };
+            var Longitude = this.HttpContext.Items["Longitude"];
+            var Latitude = this.HttpContext.Items["Latitude"];
+            return new object[] { Longitude, Latitude };
         }
 
         // GET api/values/5
