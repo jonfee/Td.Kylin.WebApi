@@ -49,7 +49,7 @@ namespace Td.Kylin.WebApi
             {
                 Code = code,
                 Message = message,
-                Result = result
+                Content = result
             };
 
             string data = JsonConvert.SerializeObject(apiResult, Formatting.Indented, Settings.SerializerSettings);

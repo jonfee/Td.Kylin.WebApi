@@ -17,6 +17,17 @@
         public string Message { get; set; }
 
         /// <summary>
+        /// 业务状态为true则程序出错
+        /// </summary>
+        public bool IsError
+        {
+            get
+            {
+                return Code != 0;
+            }
+        }
+
+        /// <summary>
         /// 期望结果
         /// </summary>
         public T Content { get; set; }
