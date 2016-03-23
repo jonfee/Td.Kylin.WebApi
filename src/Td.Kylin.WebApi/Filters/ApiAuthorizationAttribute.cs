@@ -142,13 +142,20 @@ namespace Td.Kylin.WebApi.Filters
          {
             foreach (var item in queryDic)
             {
-                if (item.Key == "Longitude")
+                //当前区域
+                if (item.Key == "LBSArea")
                 {
-                    context.Items.Add("Longitude", item.Value);
+                    context.Items.Add("LBSArea", item.Value);
                 }
-                if (item.Key == "Latitude")
+                //操作时位置经度
+                if (item.Key == "LBSLongitude")
                 {
-                    context.Items.Add("Latitude", item.Value);
+                    context.Items.Add("LBSLongitude", item.Value);
+                }
+                //操作时位置纬度
+                if (item.Key == "LBSLatitude")
+                {
+                    context.Items.Add("LBSLatitude", item.Value);
                 }
             }
         }
