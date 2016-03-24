@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using Td.AspNet.Utils;
-using Td.AspNet.WebApi;
 using Td.Kylin.WebApi.Cache;
 using Td.Kylin.WebApi.Models;
 
@@ -21,7 +19,7 @@ namespace Td.Kylin.WebApi.Filters
             IDictionary<string, string> queryDic = Strings.SplitUrlQuery(request.QueryString.Value);
             if (queryDic == null)
             {
-                context.Result = Message(1, "参数缺失", "URL参数缺失");
+                context.Result = ActionResultHelper.KylinOk(1, "参数缺失", "URL参数缺失");
                 return;
 
             }
@@ -31,15 +29,15 @@ namespace Td.Kylin.WebApi.Filters
 
             foreach (var item in queryDic)
             {
-                if (item.Key == "Sign")
+                if (item.Key == RequestParameterNames.Sign)
                 {
                     Sign = item.Value;
                 }
-                if (item.Key == "PartnerId")
+                if (item.Key == RequestParameterNames.PartnerId)
                 {
                     PartnerId = item.Value;
                 }
-                if (item.Key == "Timestamp")
+                if (item.Key == RequestParameterNames.Timestamp)
                 {
                     long ticks = 0;
                     long.TryParse(item.Value, out ticks);
@@ -49,14 +47,14 @@ namespace Td.Kylin.WebApi.Filters
 
             if (string.IsNullOrEmpty(PartnerId) || string.IsNullOrEmpty(Sign))
             {
-                context.Result = Message(2, "参数不正确", "参数 PartnerId 或 Sign丢失，或者值不正常");
+                context.Result = ActionResultHelper.KylinOk(2, "参数不正确", "参数 PartnerId 或 Sign丢失，或者值不正常");
                 return;
             }
 
             //采用协调世界时进行校验（接口请求时同样采用协调世界时处理）
             if (Timestamp.AddMinutes(5) < DateTime.Now.ToUniversalTime())
             {
-                context.Result = Message(3, "服务过期", "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
+                context.Result = ActionResultHelper.KylinOk(3, "服务过期", "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
                 return;
             }
 
@@ -67,18 +65,18 @@ namespace Td.Kylin.WebApi.Filters
             }
             catch (Exception ex)
             {
-                context.Result = Message(4, "获取模块授权异常", ex.Message);
+                context.Result = ActionResultHelper.KylinOk(4, "获取模块授权异常", ex.Message);
                 return;
             }
             if (moduleInfo == null)
             {
-                context.Result = Message(4, "获取模块授权异常", "模块授权信息不存在");
+                context.Result = ActionResultHelper.KylinOk(4, "获取模块授权异常", "模块授权信息不存在");
                 return;
             }
             var secret = moduleInfo.AppSecret;
             if (string.IsNullOrEmpty(moduleInfo.AppSecret))
             {
-                context.Result = Message(4, "授权未通过", "非法访问，授权未通过");
+                context.Result = ActionResultHelper.KylinOk(4, "授权未通过", "非法访问，授权未通过");
                 return;
             }
             if (Code != 0)
@@ -88,7 +86,7 @@ namespace Td.Kylin.WebApi.Filters
 
                     if (((Role)moduleInfo.Role & Code) != (Role)moduleInfo.Role)
                     {
-                        context.Result = Message(5, "授权未通过", "模块权限不够，不允许进行操作");
+                        context.Result = ActionResultHelper.KylinOk(5, "授权未通过", "模块权限不够，不允许进行操作");
                         return;
                     }
                 }
@@ -96,7 +94,7 @@ namespace Td.Kylin.WebApi.Filters
 
             if (method == "POST")
             {
-                queryDic.Remove("Sign");
+                queryDic.Remove(RequestParameterNames.Sign);
                 try
                 {
                     var data = request.Form;
@@ -108,65 +106,63 @@ namespace Td.Kylin.WebApi.Filters
                 }
                 catch (Exception ex)
                 {
-                    context.Result = Message(12, "数据异常", "request.Form 获取表单数据异常");
+                    context.Result = ActionResultHelper.KylinOk(12, "数据异常", "request.Form 获取表单数据异常");
                     return;
                 }
                 var s = Strings.SignRequest(queryDic, secret);
                 if (Sign != s)
                 {
-                    context.Result = Message(6, "签名异常", "未通过签名验证，请检查签名的参数和顺序是否正确");
+                    context.Result = ActionResultHelper.KylinOk(6, "签名异常", "未通过签名验证，请检查签名的参数和顺序是否正确");
                     return;
                 }
 
             }
             else if (method == "GET")
             {
-                queryDic.Remove("Sign");
+                queryDic.Remove(RequestParameterNames.Sign);
                 var s = Strings.SignRequest(queryDic, secret);
                 if (Sign != s)
                 {
-                    context.Result = Message(6, "签名异常", "未通过签名验证，请检查签名的参数和顺序是否正确");
+                    context.Result = ActionResultHelper.KylinOk(6, "签名异常", "未通过签名验证，请检查签名的参数和顺序是否正确");
                     return;
                 }
             }
             else
             {
-                context.Result = Message(10, "非法请求", "请求的模式不正确");
+                context.Result = ActionResultHelper.KylinOk(10, "非法请求", "请求的模式不正确");
                 return;
             }
 
-            SetRequestContext(context.HttpContext, queryDic);
+            UpdateHttpContextItems(context.HttpContext, queryDic);
         }
 
-        void SetRequestContext(HttpContext context, IDictionary<string, string> queryDic)
-         {
-            foreach (var item in queryDic)
-            {
-                //当前区域
-                if (item.Key == "LBSArea")
-                {
-                    context.Items.Add("LBSArea", item.Value);
-                }
-                //操作时位置经度
-                if (item.Key == "LBSLongitude")
-                {
-                    context.Items.Add("LBSLongitude", item.Value);
-                }
-                //操作时位置纬度
-                if (item.Key == "LBSLatitude")
-                {
-                    context.Items.Add("LBSLatitude", item.Value);
-                }
-            }
-        }
-
-        public IActionResult Message(int code, string message, string content)
+        /// <summary>
+        /// 设置请求上下文键值
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="queryDic"></param>
+        void UpdateHttpContextItems(HttpContext context, IDictionary<string, string> queryDic)
         {
-            var msg = new ErrorMessage();
-            msg.Code = code;
-            msg.Content = content;
-            msg.Message = message;
-            return ActionMessage.Ok(msg);
+            int lbsArea = 0;
+            double lbsLongitude = 0d;
+            double lbsLatitude = 0d;
+
+            if (null != queryDic && queryDic.Count > 0)
+            {
+                string area = queryDic.ContainsKey(RequestParameterNames.LBSArea) ? queryDic[RequestParameterNames.LBSArea] : "0";
+                string longitude = queryDic.ContainsKey(RequestParameterNames.LBSLongitude) ? queryDic[RequestParameterNames.LBSLongitude] : "0";
+                string latitude = queryDic.ContainsKey(RequestParameterNames.LBSLatitude) ? queryDic[RequestParameterNames.LBSLatitude] : "0";
+
+                int.TryParse(area, out lbsArea);
+                double.TryParse(longitude, out lbsLongitude);
+                double.TryParse(latitude, out lbsLatitude);
+            }
+
+            context.Items.Add(RequestParameterNames.LBSArea, lbsArea);//当前操作区域
+            context.Items.Add(RequestParameterNames.LBSLongitude, lbsLongitude);//当前操作位置经度
+            context.Items.Add(RequestParameterNames.LBSLatitude, lbsLatitude);//当前操作位置纬度
         }
+
+
     }
 }

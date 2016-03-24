@@ -1,49 +1,48 @@
 ﻿using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
+using System;
 using Td.Kylin.WebApi.Json;
 
 namespace Td.Kylin.WebApi
 {
-    public class RequestParameter
-    {
-        public int LBSArea
-        {
-            get;
-            internal set;
-
-        }
-
-        public double LBSLongitude
-        {
-            get;
-            internal set;
-
-        }
-
-        public double LBSLatitude
-        {
-            get;
-            internal set;
-        }
-    }
-
     /// <summary>
     /// Kylin接口控制器基类
-    /// </summary>
+    /// </summary>  
     public class BaseController : Controller
     {
-        private static RequestParameter _parameter = new RequestParameter();
+        private Location _location;
 
-        protected RequestParameter Parameter
+        /// <summary>
+        /// 当前位置
+        /// </summary>
+        protected Location Location
         {
             get
             {
-                _parameter.LBSArea = int.Parse(HttpContext.Items["LBSArea"].ToString());
-                _parameter.LBSLongitude = double.Parse(HttpContext.Items["LBSLongitude"].ToString());
-                _parameter.LBSLatitude = double.Parse(HttpContext.Items["LBSLatitude"].ToString());
+                if (null == _location)
+                {
+                    int lbsArea = 0;
+                    double lbsLongitude = 0d;
+                    double lbsLatitude = 0d;
 
-                return _parameter;
+                    string area = HttpContext.Items[RequestParameterNames.LBSArea] as string;
+                    string longitude = HttpContext.Items[RequestParameterNames.LBSLongitude] as string;
+                    string latitude = HttpContext.Items[RequestParameterNames.LBSLatitude] as string;
+
+                    int.TryParse(area, out lbsArea);
+                    double.TryParse(longitude, out lbsLongitude);
+                    double.TryParse(latitude, out lbsLatitude);
+
+                    _location = new Location
+                    {
+                        OperatorArea = lbsArea,
+                        Longitude = lbsLongitude,
+                        Latitude = lbsLatitude
+                    };
+                }
+
+                return _location;
             }
         }
 
@@ -52,6 +51,7 @@ namespace Td.Kylin.WebApi
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        [Obsolete("即将删除，请使用KylinOk<T>(int,string,T)")]
         public IActionResult KylinOk(object obj)
         {
             if (null == obj)
@@ -90,7 +90,28 @@ namespace Td.Kylin.WebApi
                 Content = result
             };
 
-            string data = JsonConvert.SerializeObject(apiResult, Formatting.Indented, Settings.SerializerSettings);
+            return KylinOk(apiResult);
+        }
+
+        /// <summary>
+        /// Kylin使用的HttpOkObjectResult结果返回
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public IActionResult KylinOk<T>(ApiResult<T> result)
+        {
+            if (null == result)
+            {
+                result = new ApiResult<T>
+                {
+                    Code = 0,
+                    Message = null,
+                    Content = default(T)
+                };
+            }
+
+            string data = JsonConvert.SerializeObject(result, Formatting.Indented, Settings.SerializerSettings);
 
             return Ok(data);
         }
