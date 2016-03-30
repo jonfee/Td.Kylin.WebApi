@@ -3,6 +3,7 @@ using Microsoft.AspNet.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using Td.AspNet.Utils;
+using Td.Kylin.EnumLibrary;
 using Td.Kylin.WebApi.Cache;
 using Td.Kylin.WebApi.Models;
 
@@ -19,7 +20,7 @@ namespace Td.Kylin.WebApi.Filters
             IDictionary<string, string> queryDic = Strings.SplitUrlQuery(request.QueryString.Value);
             if (queryDic == null)
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.ParametersMissing, "参数缺失", "URL参数缺失");
+                context.Result = ActionResultHelper.Error(ResultCode.ParametersMissing, "URL参数缺失");
                 return;
 
             }
@@ -47,14 +48,14 @@ namespace Td.Kylin.WebApi.Filters
 
             if (string.IsNullOrEmpty(PartnerId) || string.IsNullOrEmpty(Sign))
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.ParametersError, "参数不正确", "参数 PartnerId 或 Sign丢失，或者值不正常");
+                context.Result = ActionResultHelper.Error(ResultCode.ParametersError, "参数 PartnerId 或 Sign丢失，或者值不正常");
                 return;
             }
 
             //采用协调世界时进行校验（接口请求时同样采用协调世界时处理）
             if (Timestamp.AddMinutes(5) < DateTime.Now.ToUniversalTime())
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.RequestExpires, "服务过期", "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
+                context.Result = ActionResultHelper.Error(ResultCode.RequestExpires,  "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
                 return;
             }
 
@@ -65,18 +66,18 @@ namespace Td.Kylin.WebApi.Filters
             }
             catch (Exception ex)
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.GetModuleException, "获取模块授权异常", ex.Message);
+                context.Result = ActionResultHelper.Error(ResultCode.GetModuleException, ex.Message);
                 return;
             }
             if (moduleInfo == null)
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.GetModuleException, "获取模块授权异常", "模块授权信息不存在");
+                context.Result = ActionResultHelper.Error(ResultCode.GetModuleException, "模块授权信息不存在");
                 return;
             }
             var secret = moduleInfo.AppSecret;
             if (string.IsNullOrEmpty(moduleInfo.AppSecret))
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.AuthorizationFailed, "授权未通过", "非法访问，授权未通过");
+                context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed, "非法访问，授权未通过");
                 return;
             }
             if (Code != 0)
@@ -86,7 +87,7 @@ namespace Td.Kylin.WebApi.Filters
 
                     if (((Role)moduleInfo.Role & Code) != (Role)moduleInfo.Role)
                     {
-                        context.Result = ActionResultHelper.KylinOk(ResultCode.AuthorizationFailed, "授权未通过", "模块权限不够，不允许进行操作");
+                        context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed,  "模块权限不够，不允许进行操作");
                         return;
                     }
                 }
@@ -106,13 +107,13 @@ namespace Td.Kylin.WebApi.Filters
                 }
                 catch (Exception ex)
                 {
-                    context.Result = ActionResultHelper.KylinOk(ResultCode.DataException, "数据异常", "request.Form 获取表单数据异常");
+                    context.Result = ActionResultHelper.Error(ResultCode.DataException,  "request.Form 获取表单数据异常");
                     return;
                 }
                 var s = Strings.SignRequest(queryDic, secret);
                 if (Sign != s)
                 {
-                    context.Result = ActionResultHelper.KylinOk(ResultCode.SignException, "签名异常", "未通过签名验证，请检查签名的参数和顺序是否正确");
+                    context.Result = ActionResultHelper.Error(ResultCode.SignException,  "未通过签名验证，请检查签名的参数和顺序是否正确");
                     return;
                 }
 
@@ -123,13 +124,13 @@ namespace Td.Kylin.WebApi.Filters
                 var s = Strings.SignRequest(queryDic, secret);
                 if (Sign != s)
                 {
-                    context.Result = ActionResultHelper.KylinOk(ResultCode.SignException, "签名异常", "未通过签名验证，请检查签名的参数和顺序是否正确");
+                    context.Result = ActionResultHelper.Error(ResultCode.SignException, "未通过签名验证，请检查签名的参数和顺序是否正确");
                     return;
                 }
             }
             else
             {
-                context.Result = ActionResultHelper.KylinOk(ResultCode.RequestModeInvalid, "非法请求", "请求的模式不正确");
+                context.Result = ActionResultHelper.Error(ResultCode.RequestModeInvalid,  "请求的模式不正确");
                 return;
             }
 

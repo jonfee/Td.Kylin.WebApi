@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNet.Mvc;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
+using Td.Common;
+using Td.Kylin.EnumLibrary;
 using Td.Kylin.WebApi.Json;
 
 namespace Td.Kylin.WebApi
@@ -13,9 +15,23 @@ namespace Td.Kylin.WebApi
         /// <typeparam name="T"></typeparam>
         /// <param name="result"></param>
         /// <returns></returns>
-        public IActionResult KylinOk<T>(T result)
+        public static IActionResult Success<T>(T result)
         {
             return KylinOk(ResultCode.Success, null, result);
+        }
+
+        /// <summary>
+        /// 表示执行结果错误时的HttpOkObjectResult结果返回
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="code">结果状态码<seealso cref="ResultCode"/></param>
+        /// <param name="errorContent"></param>
+        /// <returns></returns>
+        public static IActionResult Error(ResultCode resultCode, string errorContent = null)
+        {
+            string err = EnumUtility.GetEnumDescription<ResultCode>(resultCode.ToString());
+
+            return KylinOk((int)resultCode, err, errorContent ?? err);
         }
 
         /// <summary>
