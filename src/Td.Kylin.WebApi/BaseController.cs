@@ -74,6 +74,30 @@ namespace Td.Kylin.WebApi
         }
 
         /// <summary>
+        /// 表示执行结果为<seealso cref="ResultCode.Success"/>时的HttpOkObjectResult结果返回
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public IActionResult KylinOk<T>(T result)
+        {
+            return KylinOk(ResultCode.Success, null, result);
+        }
+
+        /// <summary>
+        /// Kylin使用的HttpOkObjectResult结果返回
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="code">结果状态码<seealso cref="ResultCode"/></param>
+        /// <param name="message"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public IActionResult KylinOk<T>(ResultCode resultCode, string message, T result)
+        {
+            return KylinOk((int)resultCode, message, result);
+        }
+
+        /// <summary>
         /// Kylin使用的HttpOkObjectResult结果返回
         /// </summary>
         /// <typeparam name="T"></typeparam>
