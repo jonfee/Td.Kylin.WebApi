@@ -22,30 +22,29 @@ namespace Td.Kylin.WebApi
         {
             get
             {
-                if (null == _location)
+
+                int lbsArea = 0;
+                double lbsLongitude = 0d;
+                double lbsLatitude = 0d;
+
+                string area = HttpContext.Items[RequestParameterNames.LBSArea].ToString();
+                string longitude = HttpContext.Items[RequestParameterNames.LBSLongitude].ToString();
+                string latitude = HttpContext.Items[RequestParameterNames.LBSLatitude].ToString();
+
+                int.TryParse(area, out lbsArea);
+                double.TryParse(longitude, out lbsLongitude);
+                double.TryParse(latitude, out lbsLatitude);
+
+                _location = new Location
                 {
-                    int lbsArea = 0;
-                    double lbsLongitude = 0d;
-                    double lbsLatitude = 0d;
-
-                    string area = HttpContext.Items[RequestParameterNames.LBSArea] as string;
-                    string longitude = HttpContext.Items[RequestParameterNames.LBSLongitude] as string;
-                    string latitude = HttpContext.Items[RequestParameterNames.LBSLatitude] as string;
-
-                    int.TryParse(area, out lbsArea);
-                    double.TryParse(longitude, out lbsLongitude);
-                    double.TryParse(latitude, out lbsLatitude);
-
-                    _location = new Location
-                    {
-                        OperatorArea = lbsArea,
-                        Longitude = lbsLongitude,
-                        Latitude = lbsLatitude
-                    };
-                }
+                    OperatorArea = lbsArea,
+                    Longitude = lbsLongitude,
+                    Latitude = lbsLatitude
+                };
 
                 return _location;
             }
+
         }
 
         /// <summary>
