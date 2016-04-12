@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
 using Td.AspNet.WebApi;
 using Td.Kylin.WebApi.Website.Models;
 using Td.AspNet.Utils;
+using Td.Diagnostics;
+using Td.Web.Filters;
 
 namespace Td.Kylin.WebApi.Website.Controllers
 {
     public class HomeController : BaseController
     {
-        public IActionResult Index()
+		private readonly IHostingEnvironment _hostingEnvironment;
+
+		public HomeController(IHostingEnvironment hostingEnvironment)
+		{
+			_hostingEnvironment = hostingEnvironment;
+		}
+
+		public IActionResult Index()
         {
             var dic = new Dictionary<string, string>();
             dic.Add("ID", "天道新创");
@@ -46,9 +56,16 @@ namespace Td.Kylin.WebApi.Website.Controllers
             return View();
         }
 
-        public IActionResult Error()
-        {
-            return View("~/Views/Shared/Error.cshtml");
-        }
+	    public IActionResult TestLogger()
+	    {
+			Logger.Info("info...");
+			Logger.Debug("debug...");
+			return KylinOk("日志写入成功...");
+		}
+
+	    public IActionResult TestError()
+	    {
+		    throw new InvalidOperationException("exception test...");
+	    }
     }
 }

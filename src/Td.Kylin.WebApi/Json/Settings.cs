@@ -20,10 +20,10 @@ namespace Td.Kylin.WebApi.Json
                 SerializerSettings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
                 SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
 
-                //空值处理
-                //SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+				//空值处理
+				//SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
-                SerializerSettings.Converters.Add(new Int64Convert());
+				SerializerSettings.Converters.Add(new Int64Convert());
 
                 SerializerSettings.Converters.Add(new StringConvert());
 

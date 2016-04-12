@@ -4,76 +4,96 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+
+using Td.Web;
+using Td.Diagnostics;
 
 namespace Td.Kylin.WebApi.Website
 {
-    public class Startup
-    {
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
-        {
-            // Setup configuration sources.
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(appEnv.ApplicationBasePath)
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
-        }
+	public class Startup
+	{
+		public IConfigurationRoot Configuration
+		{
+			get;
+			set;
+		}
 
-        public IConfigurationRoot Configuration { get; set; }
+		public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
+		{
+			// 启动应用程序。
+			Application.Start(new ApplicationContext(env, appEnv), null);
 
-        // This method gets called by the runtime.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Add MVC services to the services container.
-            services.AddMvc();
+			var builder = new ConfigurationBuilder().SetBasePath(appEnv.ApplicationBasePath).AddJsonFile("appsettings.json").AddEnvironmentVariables();
 
-            // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
-            // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
-            // services.AddWebApiConventions();
-        }
+			this.Configuration = builder.Build();
+		}
 
-        // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
+		public void ConfigureServices(IServiceCollection services)
+		{
+			// 初始化异常处理程序。
+			this.InitExceptionHandler(services);
 
+			// 初始化日志模块。
+			this.InitLoggerModule();
 
-            // Configure the HTTP request pipeline.
+			services.AddMvc();
+		}
 
-            // Add the following to the request pipeline only in development environment.
-            if (env.IsDevelopment())
-            {
-                app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // Add Error handling middleware which catches all application specific errors and
-                // send the request to the following path or controller action.
-                app.UseExceptionHandler("/Home/Error");
-            }
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		{
+			if(env.IsDevelopment())
+			{
+				app.UseBrowserLink();
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/Home/Error");
+			}
 
-            app.UseKylinWebApi(Configuration);
+			app.UseKylinWebApi(Configuration);
+			app.UseIISPlatformHandler();
+			app.UseStaticFiles();
 
-            // Add the platform handler to the request pipeline.
-            app.UseIISPlatformHandler();
+			app.UseMvc(routes =>
+			{
+				routes.MapRoute(name : "default", template : "{controller=Home}/{action=Index}/{id?}");
+			});
+		}
 
-            // Add static files to the request pipeline.
-            app.UseStaticFiles();
+		private void InitExceptionHandler(IServiceCollection services)
+		{
+			// 添加异常拦截处理程序。
+			ExceptionHandlerManager.Instance.Handlers.Add(new UnknownExceptionHandler());
 
-            // Add MVC to the request pipeline.
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+			// 添加全局异常过滤器。
+			services.Configure<MvcOptions>(options =>
+			{
+				options.Filters.Add(new Td.Web.Filters.HandleExceptionFilter());
+			});
+		}
 
-                // Uncomment the following line to add a route for porting Web API 2 controllers.
-                // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
-            });
-        }
-    }
+		private void InitLoggerModule()
+		{
+			var handler = new LoggerHandler
+			(
+				"debug",
+				new TextFileLogger
+				{
+					FilePath = "logs/debug/${binding:timestamp#yyyyMM}/${binding:source}[{sequence}].log"
+				},
+				new LoggerHandlerPredication()
+				{
+					MinLevel = LogLevel.Debug,
+					MaxLevel = LogLevel.Warn
+				}
+			);
+
+			Logger.Handlers.Add(handler);
+		}
+	}
 }
