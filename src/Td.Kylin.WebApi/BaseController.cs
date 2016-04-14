@@ -96,9 +96,9 @@ namespace Td.Kylin.WebApi
         {
             string err = EnumUtility.GetEnumDescription<ResultCode>(resultCode.ToString());
 
-            return KylinOk((int)resultCode, errorContent ?? err, "null");
+            return KylinOk((int)resultCode, err, errorContent ?? err);
         }
-
+        
         /// <summary>
         /// Kylin使用的HttpOkObjectResult结果返回
         /// </summary>
