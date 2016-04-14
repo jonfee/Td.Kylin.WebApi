@@ -96,7 +96,7 @@ namespace Td.Kylin.WebApi
         {
             string err = EnumUtility.GetEnumDescription<ResultCode>(resultCode.ToString());
 
-            return KylinOk((int)resultCode, err, errorContent ?? err);
+            return KylinOk((int)resultCode, errorContent ?? err, "null");
         }
 
         /// <summary>
