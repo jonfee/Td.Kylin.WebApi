@@ -12,10 +12,14 @@
 
 	<option path="/Diagnostics">
 		<logger>
-			<handler name="File" type="Td.Diagnostics.TextFileLogger, Td.CoreLibrary" filePath="logs/${binding:timestamp#yyyyMM}/${binding:source}[{sequence}].log">
-				<predication minLevel="Info" />
+			<handler name="Error" type="Td.Diagnostics.TextFileLogger, Td.CoreLibrary" filePath="logs/error/${binding:timestamp#yyyyMM}/${binding:source}[{sequence}].log">
+				<predication minLevel="Error" />
+			</handler>
+
+			<handler name="Debug" type="Td.Diagnostics.TextFileLogger, Td.CoreLibrary" filePath="logs/debug/${binding:timestamp#yyyyMM}/${binding:source}[{sequence}].log">
+				<predication minLevel="Debug" />
+				<predication maxLevel="Warn" />
 			</handler>
 		</logger>
 	</option>
-
 </options>

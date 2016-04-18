@@ -20,9 +20,9 @@
         "Td.AspNet.WebApi": "1.0.0-rc1-*",
         "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc1-final",
         "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final",
-        "Td.Kylin.WebApi": "1.0.0-rc1-81",
-        "Td.CoreLibrary": "1.0.8.1-beta",
-        "Td.Web": "1.0.2.2-beta"
+        "Td.CoreLibrary": "1.0.8.2-beta",
+        "Td.Web": "1.0.2.3-beta",
+        "Td.Kylin.WebApi": "1.0.0-rc1-82"
     },
 
   "commands": {

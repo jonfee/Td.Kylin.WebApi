@@ -37,9 +37,6 @@ namespace Td.Kylin.WebApi.Website
 			// 初始化异常处理程序。
 			this.InitExceptionHandler(services);
 
-			// 初始化日志模块。
-			this.InitLoggerModule();
-
 			services.AddMvc();
 		}
 
@@ -75,25 +72,6 @@ namespace Td.Kylin.WebApi.Website
 			{
 				options.Filters.Add(new Td.Web.Filters.HandleExceptionFilter());
 			});
-		}
-
-		private void InitLoggerModule()
-		{
-			var handler = new LoggerHandler
-			(
-				"debug",
-				new TextFileLogger
-				{
-					FilePath = "logs/debug/${binding:timestamp#yyyyMM}/${binding:source}[{sequence}].log"
-				},
-				new LoggerHandlerPredication()
-				{
-					MinLevel = LogLevel.Debug,
-					MaxLevel = LogLevel.Warn
-				}
-			);
-
-			Logger.Handlers.Add(handler);
 		}
 	}
 }
