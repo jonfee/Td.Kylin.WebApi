@@ -56,6 +56,11 @@ namespace Td.Kylin.WebApi.Website.Controllers
             return View();
         }
 
+        public IActionResult TestArgument(string args)
+        {
+            return KylinOk(args);
+        }
+
 	    public IActionResult TestLogger()
 	    {
 			Logger.Info("info...");

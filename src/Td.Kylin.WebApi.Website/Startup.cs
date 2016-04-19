@@ -37,7 +37,13 @@ namespace Td.Kylin.WebApi.Website
 			// 初始化异常处理程序。
 			this.InitExceptionHandler(services);
 
-			services.AddMvc();
+            // 添加全局参数过滤器。
+            services.Configure<MvcOptions>(options =>
+            {
+                //options.Filters.Add(new Td.Kylin.WebApi.Filters.HandleArgumentFilter());
+            });
+
+            services.AddMvc();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -52,7 +58,7 @@ namespace Td.Kylin.WebApi.Website
 				app.UseExceptionHandler("/Home/Error");
 			}
 
-			app.UseKylinWebApi(Configuration);
+            app.UseKylinWebApi(Configuration);
 			app.UseIISPlatformHandler();
 			app.UseStaticFiles();
 
