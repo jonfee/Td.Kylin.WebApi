@@ -158,10 +158,12 @@ namespace Td.Kylin.WebApi.Filters
                 double.TryParse(longitude, out lbsLongitude);
                 double.TryParse(latitude, out lbsLatitude);
             }
-
-            context.Items.Add(RequestParameterNames.LBSArea, lbsArea);//当前操作区域
-            context.Items.Add(RequestParameterNames.LBSLongitude, lbsLongitude);//当前操作位置经度
-            context.Items.Add(RequestParameterNames.LBSLatitude, lbsLatitude);//当前操作位置纬度
+            context.Items[RequestParameterNames.LBSArea] = lbsArea;
+            context.Items[RequestParameterNames.LBSLongitude] = lbsArea;
+            context.Items[RequestParameterNames.LBSLatitude] = lbsArea;
+            //context.Items.Add(RequestParameterNames.LBSArea, lbsArea);//当前操作区域
+            //context.Items.Add(RequestParameterNames.LBSLongitude, lbsLongitude);//当前操作位置经度
+            //context.Items.Add(RequestParameterNames.LBSLatitude, lbsLatitude);//当前操作位置纬度
         }
 
 
