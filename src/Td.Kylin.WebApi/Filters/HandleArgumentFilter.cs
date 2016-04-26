@@ -12,7 +12,7 @@ namespace Td.Kylin.WebApi.Filters
     public class HandleArgumentFilter : ActionFilterAttribute
     {
         private static readonly ICache _cache = new MemoryCache("ARGUMENT_LOGGERS");
-    
+
         #region 重写方法
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -28,14 +28,15 @@ namespace Td.Kylin.WebApi.Filters
 
         private void WriteLog(ActionExecutingContext context)
         {
-            if(context.RouteData.Values.Keys.Contains("controller") && context.RouteData.Values.Keys.Contains("action"))
+            if (context.RouteData.Values.Keys.Contains("controller") && context.RouteData.Values.Keys.Contains("action"))
             {
-                var arguments = Strings.SplitUrlQuery(context.HttpContext.Request.QueryString.Value);
+                var arguments = context.ActionArguments;
                 var controllerName = context.RouteData.Values["controller"].ToString();
                 var actionName = context.RouteData.Values["action"].ToString();
-
+                
                 var content = new
                 {
+                    Method = context.HttpContext.Request.Method,
                     Controller = controllerName,
                     Action = actionName,
                     Arguments = arguments
@@ -69,7 +70,7 @@ namespace Td.Kylin.WebApi.Filters
                 }, new LoggerHandlerPredication()
                 {
                     MinLevel = LogLevel.Debug,
-                    MaxLevel= LogLevel.Info
+                    MaxLevel = LogLevel.Info
                 });
 
                 // 将日志记录处理程序加入缓存。
