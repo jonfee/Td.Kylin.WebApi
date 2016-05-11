@@ -33,10 +33,10 @@ namespace Td.Kylin.WebApi.Filters
                 var arguments = context.ActionArguments;
                 var controllerName = context.RouteData.Values["controller"].ToString();
                 var actionName = context.RouteData.Values["action"].ToString();
-                
                 var content = new
                 {
                     Method = context.HttpContext.Request.Method,
+                    Sgin = context.HttpContext.Request.QueryString.Value,
                     Controller = controllerName,
                     Action = actionName,
                     Arguments = arguments
