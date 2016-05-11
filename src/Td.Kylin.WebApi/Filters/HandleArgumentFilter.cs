@@ -36,7 +36,7 @@ namespace Td.Kylin.WebApi.Filters
                 var content = new
                 {
                     Method = context.HttpContext.Request.Method,
-                    Sgin = context.HttpContext.Request.QueryString.Value,
+                    Sgin = Strings.SplitUrlQuery(context.HttpContext.Request.QueryString.Value),
                     Controller = controllerName,
                     Action = actionName,
                     Arguments = arguments
