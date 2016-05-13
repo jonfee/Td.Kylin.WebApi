@@ -3,8 +3,11 @@ using Microsoft.AspNet.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using Td.AspNet.Utils;
+using Td.Common;
+using Td.Kylin.DataCache;
+using Td.Kylin.DataCache.CacheModel;
 using Td.Kylin.EnumLibrary;
-using Td.Kylin.WebApi.Cache;
+using Td.Kylin.WebApi.Data;
 using Td.Kylin.WebApi.Models;
 
 namespace Td.Kylin.WebApi.Filters
@@ -55,14 +58,19 @@ namespace Td.Kylin.WebApi.Filters
             //采用协调世界时进行校验（接口请求时同样采用协调世界时处理）
             if (Timestamp.AddMinutes(5) < DateTime.Now.ToUniversalTime())
             {
-                context.Result = ActionResultHelper.Error(ResultCode.RequestExpires,  "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
+                context.Result = ActionResultHelper.Error(ResultCode.RequestExpires, "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
                 return;
             }
 
-            var moduleInfo = new System_ModuleAuthorize();
+            var moduleInfo = new ApiModuleAuthorizeCacheModel();
             try
             {
-                moduleInfo = ModuleAuthorizeCache.GetSecret(PartnerId);
+                moduleInfo = CacheCollection.ApiModuleAuthorizeCache.Get(WebApiConfig.Options.ServerID, PartnerId);
+
+                if (null == moduleInfo)
+                {
+                    moduleInfo = ModuleAuthorizeProvider.GetAuth(WebApiConfig.Options.ServerID, PartnerId);
+                }
             }
             catch (Exception ex)
             {
@@ -80,17 +88,30 @@ namespace Td.Kylin.WebApi.Filters
                 context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed, "非法访问，授权未通过");
                 return;
             }
-            if (Code != 0)
-            {
-                if ((Role)moduleInfo.Role != Role.Admin)
-                {
 
-                    if (((Role)moduleInfo.Role & Code) != (Role)moduleInfo.Role)
-                    {
-                        context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed,  "模块权限不够，不允许进行操作");
-                        return;
-                    }
-                }
+            bool powerSuccess = new Func<bool>(() =>
+              {
+                  //不需要权限
+                  if (Code <= 0) return true;
+
+                  //访问的模块为Admin权限，通关
+                  if (EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Admin)) return true;
+
+                  //Use权限，且访问的模块拥有Editor或Use权限
+                  if (EnumUtility.ContainsEnumItem((int)Code, Role.Use) && (EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Editor) || EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Use))) return true;
+
+                  //Editor权限，且访问的模块拥有Editer权限
+                  if (EnumUtility.ContainsEnumItem((int)Code, Role.Editor) && EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Editor)) return true;
+
+                  return false;
+
+              }).Invoke();
+
+            //权限校验
+            if (!powerSuccess)
+            {
+                context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed, "模块权限不足。");
+                return;
             }
 
             if (method == "POST")
@@ -107,13 +128,13 @@ namespace Td.Kylin.WebApi.Filters
                 }
                 catch (Exception ex)
                 {
-                    context.Result = ActionResultHelper.Error(ResultCode.DataException,  "request.Form 获取表单数据异常");
+                    context.Result = ActionResultHelper.Error(ResultCode.DataException, "request.Form 获取表单数据异常");
                     return;
                 }
                 var s = Strings.SignRequest(queryDic, secret);
                 if (Sign != s)
                 {
-                    context.Result = ActionResultHelper.Error(ResultCode.SignException,  "未通过签名验证，请检查签名的参数和顺序是否正确");
+                    context.Result = ActionResultHelper.Error(ResultCode.SignException, "未通过签名验证，请检查签名的参数和顺序是否正确");
                     return;
                 }
 
@@ -130,7 +151,7 @@ namespace Td.Kylin.WebApi.Filters
             }
             else
             {
-                context.Result = ActionResultHelper.Error(ResultCode.RequestModeInvalid,  "请求的模式不正确");
+                context.Result = ActionResultHelper.Error(ResultCode.RequestModeInvalid, "请求的模式不正确");
                 return;
             }
 

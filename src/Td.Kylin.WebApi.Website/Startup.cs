@@ -11,6 +11,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 
 using Td.Web;
 using Td.Diagnostics;
+using Td.Kylin.EnumLibrary;
 
 namespace Td.Kylin.WebApi.Website
 {
@@ -58,7 +59,23 @@ namespace Td.Kylin.WebApi.Website
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseKylinWebApi(Configuration);
+            string sqlConn = Configuration["Data:APIConnectionString"];
+
+            SqlProviderType sqlType = new Func<SqlProviderType>(() =>
+              {
+                  string sqltype = Configuration["Data:SqlType"] ?? string.Empty;
+
+                  switch (sqltype.ToLower())
+                  {
+                      case "npgsql":
+                          return SqlProviderType.NpgSQL;
+                      case "mssql":
+                      default:
+                          return SqlProviderType.SqlServer;
+                  }
+              }).Invoke();
+
+            app.UseKylinWebApi(Configuration["ServerId"], sqlConn, sqlType);
             app.UseIISPlatformHandler();
             app.UseStaticFiles();
 

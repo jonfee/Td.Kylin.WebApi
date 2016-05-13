@@ -39,7 +39,7 @@ namespace Td.Kylin.WebApi
         public Task Invoke(HttpContext context)
         {
             HttpRequest request = context.Request;
-            WebApiConfig.Configuration = _options.Configuration;
+            WebApiConfig.Options = _options;
 
             return _next(context);
         }

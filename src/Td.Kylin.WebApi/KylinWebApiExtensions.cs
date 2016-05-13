@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNet.Builder;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Td.Kylin.EnumLibrary;
 
 namespace Td.Kylin.WebApi
 {
     public static class KylinWebApiExtensions
     {
+        /// <summary>
+        /// 注入授权
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static IApplicationBuilder UseKylinWebApi(this IApplicationBuilder builder, KylinWebApiOptions options)
         {
             if (builder == null)
@@ -18,9 +21,22 @@ namespace Td.Kylin.WebApi
             return builder.Use(next => new KylinWebApiMiddleware(next, options).Invoke);
         }
 
-        public static IApplicationBuilder UseKylinWebApi(this IApplicationBuilder builder, IConfigurationRoot config)
+        /// <summary>
+        /// 注入授权
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="serverID">当前接口服务ID</param>
+        /// <param name="sqlConnection"></param>
+        /// <param name="sqlType"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseKylinWebApi(this IApplicationBuilder builder, string serverID, string sqlConnection, SqlProviderType sqlType)
         {
-            return UseKylinWebApi(builder, new KylinWebApiOptions { Configuration = config });
+            return UseKylinWebApi(builder, new KylinWebApiOptions
+            {
+                SqlConnectionString = sqlConnection,
+                SqlType = sqlType,
+                ServerID = serverID
+            });
         }
     }
 }

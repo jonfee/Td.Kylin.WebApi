@@ -1,14 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Td.Kylin.EnumLibrary;
 
 namespace Td.Kylin.WebApi
 {
     public class WebApiConfig
     {
-        public static IConfigurationRoot Configuration { get; set; }
+        public static KylinWebApiOptions Options;
     }
 
     /// <summary>
