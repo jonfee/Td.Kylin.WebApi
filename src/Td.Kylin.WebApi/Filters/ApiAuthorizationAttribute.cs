@@ -67,6 +67,9 @@ namespace Td.Kylin.WebApi.Filters
             }
             catch (Exception ex)
             {
+                // 记录授权异常信息。
+                Td.Diagnostics.Logger.Error(ex);
+
                 context.Result = ActionResultHelper.Error(ResultCode.GetModuleException, ex.Message);
                 return;
             }
