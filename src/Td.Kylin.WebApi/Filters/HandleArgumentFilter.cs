@@ -35,7 +35,7 @@ namespace Td.Kylin.WebApi.Filters
                 var actionName = context.RouteData.Values["action"].ToString();
                 var content = new
                 {
-                    Url = context.HttpContext.Request.QueryString,
+                    Url = context.HttpContext.Request.QueryString.Value,
                     Method = context.HttpContext.Request.Method,
                     Sgin = Strings.SplitUrlQuery(context.HttpContext.Request.QueryString.Value),
                     Controller = controllerName,
