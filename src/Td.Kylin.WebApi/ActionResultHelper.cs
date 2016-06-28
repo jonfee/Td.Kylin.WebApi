@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Td.Common;
@@ -66,7 +67,7 @@ namespace Td.Kylin.WebApi
 
             string data = JsonConvert.SerializeObject(apiResult, Formatting.Indented, Settings.SerializerSettings);
 
-            var result = new HttpOkObjectResult("api");
+            var result = new OkObjectResult("api");
             result.Value = data;
             result.StatusCode = 200;
             result.ContentTypes.Add(new MediaTypeHeaderValue("application/json"));

@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Entity;
+﻿
+using Microsoft.EntityFrameworkCore;
 using Td.Kylin.WebApi.Models;
 
 namespace Td.Kylin.WebApi.Data
@@ -13,7 +14,7 @@ namespace Td.Kylin.WebApi.Data
                     options.UseSqlServer(WebApiConfig.Options.SqlConnectionString);
                     break;
                 case EnumLibrary.SqlProviderType.NpgSQL:
-                    options.UseNpgsql(WebApiConfig.Options.SqlConnectionString);
+                    //options.UseNpgsql(WebApiConfig.Options.SqlConnectionString);
                     break;
             }
         }

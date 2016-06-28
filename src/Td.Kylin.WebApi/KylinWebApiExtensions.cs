@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Builder;
+﻿
+using Microsoft.AspNetCore.Builder;
 using System;
 using Td.Kylin.EnumLibrary;
 

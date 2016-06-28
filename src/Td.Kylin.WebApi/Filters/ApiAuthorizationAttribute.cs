@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc.Filters;
+﻿
 using System;
 using System.Collections.Generic;
 using Td.AspNet.Utils;
@@ -7,6 +6,8 @@ using Td.Common;
 using Td.Kylin.EnumLibrary;
 using Td.Kylin.WebApi.Cache;
 using Td.Kylin.WebApi.Models;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http;
 
 namespace Td.Kylin.WebApi.Filters
 {

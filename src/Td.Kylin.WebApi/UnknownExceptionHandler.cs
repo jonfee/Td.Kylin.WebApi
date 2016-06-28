@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 
 using Td.Diagnostics;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Filters;
+
 using Newtonsoft.Json;
 using Td.Kylin.EnumLibrary;
 using Td.Kylin.WebApi.Json;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace Td.Kylin.WebApi
 {
@@ -77,20 +78,6 @@ namespace Td.Kylin.WebApi
 
 		}
 
-#if DNX451
-		/// <summary>
-		/// 初始化 UnknownExceptionHandler 类的新实例。
-		/// </summary>
-		/// <param name="view">异常视图。</param>
-		/// <param name="master">模板视图。</param>
-		public UnknownExceptionHandler(string view, string master) : base(new Type[] { typeof(ApplicationException), typeof(SystemException), typeof(Exception) })
-		{
-			this.View = view;
-			this.Master = master;
-		}
-#endif
-
-#if DNXCORE50
 		/// <summary>
 		/// 初始化 UnknownExceptionHandler 类的新实例。
 		/// </summary>
@@ -101,7 +88,6 @@ namespace Td.Kylin.WebApi
 			this.View = view;
 			this.Master = master;
 		}
-#endif
 
 		#endregion
 

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+﻿
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using Td.Common;
 using Td.Kylin.EnumLibrary;
 using Td.Kylin.WebApi.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Td.Kylin.WebApi
 {
