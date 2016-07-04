@@ -1,4 +1,5 @@
 {
+  "version": "1.1.0",
   "authors": [ "明月" ],
 
   "dependencies": {
@@ -19,9 +20,5 @@
     "netstandard1.6": {
       "imports": "dnxcore50"
     }
-  },
-  "licenseUrl": "",
-  "projectUrl": "",
-  "tags": [ "" ],
-  "version": "1.2.0"
+  }
 }
