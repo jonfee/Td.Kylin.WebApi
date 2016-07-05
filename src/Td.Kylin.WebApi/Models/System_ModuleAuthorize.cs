@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Td.Kylin.WebApi.Models
 {
+	[Table("System_ModuleAuthorize")]
     public class System_ModuleAuthorize
     {
         /// <summary>
