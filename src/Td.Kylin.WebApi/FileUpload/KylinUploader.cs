@@ -102,7 +102,8 @@ namespace Td.Kylin.WebApi.FileUpload
         /// </summary>
         public void Save()
         {
-            var results = _uploadContext.Save().Result;
+            var dd = _uploadContext.Save();
+			var results = dd.Result;
 
             results.ConvertUploadResult(_startBoot, _startReplace);
 
