@@ -34,6 +34,7 @@ namespace Td.Kylin.WebApi.Filters
                 var arguments = context.ActionArguments;
                 var controllerName = context.RouteData.Values["controller"].ToString();
                 var actionName = context.RouteData.Values["action"].ToString();
+
                 var content = new
                 {
                     Url = context.HttpContext.Request.QueryString.Value,
@@ -44,12 +45,12 @@ namespace Td.Kylin.WebApi.Filters
                     Arguments = arguments
                 };
 
-                var data = JsonConvert.SerializeObject(content, Formatting.Indented, Settings.SerializerSettings);
+                //var data = JsonConvert.SerializeObject(content, Formatting.Indented, Settings.SerializerSettings);
 
                 var handler = GetLoggerHandler(controllerName, actionName);
 
                 // 写入日志。
-                handler.Handle(new LogEntry(LogLevel.Info, null, "", data));
+                handler.Handle(new LogEntry(LogLevel.Info, null, "", content));
             }
         }
 
