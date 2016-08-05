@@ -6,7 +6,7 @@ using Td.Common;
 using Td.Kylin.EnumLibrary;
 using Td.Kylin.WebApi.Json;
 using Microsoft.AspNetCore.Mvc;
-
+using Td.Serialization;
 namespace Td.Kylin.WebApi
 {
     /// <summary>
@@ -99,7 +99,7 @@ namespace Td.Kylin.WebApi
 
             return KylinOk((int)resultCode, err, errorContent ?? err);
         }
-        
+
         /// <summary>
         /// Kylin使用的HttpOkObjectResult结果返回
         /// </summary>
@@ -129,7 +129,6 @@ namespace Td.Kylin.WebApi
                 Message = message,
                 Content = result
             };
-
             return KylinOk(apiResult);
         }
 
@@ -150,8 +149,10 @@ namespace Td.Kylin.WebApi
                     Content = default(T)
                 };
             }
+            
+            string data = Serializer.Json.Serialize(result, Settings.TextSerializationSetting);
 
-            string data = JsonConvert.SerializeObject(result, Formatting.Indented, Settings.SerializerSettings);
+            //string data1 = JsonConvert.SerializeObject(result, Formatting.Indented, Settings.SerializerSettings);
 
             return Ok(data);
         }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using Td.Serialization;
 
 namespace Td.Kylin.WebApi.Json
 {
@@ -8,6 +9,20 @@ namespace Td.Kylin.WebApi.Json
     /// </summary>
     public class Settings
     {
+        public static TextSerializationSettings TextSerializationSetting
+        {
+            get
+            {
+                return new TextSerializationSettings()
+                {
+                    MaximumDepth = 100,
+                    Indented = false,
+                    SerializationMembers = SerializationMembers.All
+                };
+            }
+        }
+
+
         public readonly static JsonSerializerSettings SerializerSettings;
 
         static Settings()
