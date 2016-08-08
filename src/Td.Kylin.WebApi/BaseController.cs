@@ -150,9 +150,9 @@ namespace Td.Kylin.WebApi
                 };
             }
             
-            string data = Serializer.Json.Serialize(result, Settings.TextSerializationSetting);
+            //string data = Serializer.Json.Serialize(result, Settings.TextSerializationSetting);
 
-            //string data1 = JsonConvert.SerializeObject(result, Formatting.Indented, Settings.SerializerSettings);
+            string data = JsonConvert.SerializeObject(result, Formatting.Indented, Settings.SerializerSettings);
 
             return Ok(data);
         }
