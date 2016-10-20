@@ -159,7 +159,7 @@ namespace Td.Kylin.WebApi
             var controllerName = actionContext.RouteData.Values["controller"].ToString();
             var actionName = actionContext.RouteData.Values["action"].ToString();
             #region 像服务器发送错误日志
-            /*
+            
             var list = new List<LogsModel>();
 
             list.Add(new LogsModel
@@ -190,7 +190,6 @@ namespace Td.Kylin.WebApi
                 var jsonResult = responseResultReadAsync.Result;
             }
 
-    */
             #endregion
 
             //写入日志。

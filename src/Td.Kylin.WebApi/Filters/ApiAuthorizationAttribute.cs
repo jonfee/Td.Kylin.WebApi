@@ -95,7 +95,8 @@ namespace Td.Kylin.WebApi.Filters
                     var dic = new Dictionary<string, string>();
                     foreach (var item in data)
                     {
-                        queryDic.Add(item.Key, item.Value[0]);
+                        if (!queryDic.ContainsKey(item.Key))
+                            queryDic.Add(item.Key, item.Value[0]);
                     }
                 }
                 catch (Exception ex)
