@@ -193,7 +193,7 @@ namespace Td.Kylin.WebApi
             #endregion
 
             //写入日志。
-            Logger.Error(exception);
+            //Logger.Error(exception);
         }
 
         #endregion
