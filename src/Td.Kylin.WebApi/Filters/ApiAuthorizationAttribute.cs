@@ -13,6 +13,20 @@ namespace Td.Kylin.WebApi.Filters
 {
     public class ApiAuthorizationAttribute : ActionFilterAttribute
     {
+        /// <summary>
+        /// 合作身份
+        /// </summary>
+        public class Partner
+        {
+            public string PartnerId { get; set; }
+
+            public string Sign { get; set; }
+
+            public DateTime Timestamp { get; set; }
+
+            public System_ModuleAuthorize Authorize { get; set; }
+        }
+
         public Role Code { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -24,47 +38,43 @@ namespace Td.Kylin.WebApi.Filters
             {
                 context.Result = ActionResultHelper.Error(ResultCode.ParametersMissing, "URL参数缺失");
                 return;
-
             }
-            string Sign = string.Empty;
-            DateTime Timestamp = DateTime.Parse("1970-01-01 00:00:00");
-            string PartnerId = string.Empty;
+
+            #region //合作者身份
+
+            Partner partner = new Partner { Timestamp = DateTime.Parse("1970-01-01").ToUniversalTime() };
 
             foreach (var item in queryDic)
             {
                 if (item.Key == RequestParameterNames.Sign)
                 {
-                    Sign = item.Value;
+                    partner.Sign = item.Value;
                 }
                 if (item.Key == RequestParameterNames.PartnerId)
                 {
-                    PartnerId = item.Value;
+                    partner.PartnerId = item.Value;
                 }
                 if (item.Key == RequestParameterNames.Timestamp)
                 {
                     long ticks = 0;
                     long.TryParse(item.Value, out ticks);
-                    Timestamp = DateTime.FromBinary(ticks);
+                    partner.Timestamp = DateTime.FromBinary(ticks);
                 }
             }
+            #endregion
 
-            if (string.IsNullOrEmpty(PartnerId) || string.IsNullOrEmpty(Sign))
+            if (string.IsNullOrEmpty(partner.PartnerId))
             {
-                context.Result = ActionResultHelper.Error(ResultCode.ParametersError, "参数 PartnerId 或 Sign丢失，或者值不正常");
+                context.Result = ActionResultHelper.Error(ResultCode.ParametersError, "必须参数PartnerId缺失");
                 return;
             }
 
-            //采用协调世界时进行校验（接口请求时同样采用协调世界时处理）
-            if (Timestamp.AddMinutes(5) < DateTime.Now.ToUniversalTime())
-            {
-                context.Result = ActionResultHelper.Error(ResultCode.RequestExpires, "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
-                return;
-            }
+            #region 授权信息
 
             var moduleInfo = new System_ModuleAuthorize();
             try
             {
-                moduleInfo = ModuleAuthorizeCache.GetSecret(PartnerId);
+                moduleInfo = ModuleAuthorizeCache.GetSecret(partner.PartnerId);
             }
             catch (Exception ex)
             {
@@ -79,73 +89,83 @@ namespace Td.Kylin.WebApi.Filters
                 context.Result = ActionResultHelper.Error(ResultCode.GetModuleException, "模块授权信息不存在");
                 return;
             }
-            var secret = moduleInfo.AppSecret;
-            if (string.IsNullOrEmpty(moduleInfo.AppSecret))
-            {
-                context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed, "非法访问，授权未通过");
-                return;
-            }
+
+            partner.Authorize = moduleInfo;
+
+            #endregion
 
             if (method == "POST")
             {
-                queryDic.Remove(RequestParameterNames.Sign);
-                try
-                {
-                    var data = request.Form;
-                    var dic = new Dictionary<string, string>();
-                    foreach (var item in data)
-                    {
-                        if (!queryDic.ContainsKey(item.Key))
-                            queryDic.Add(item.Key, item.Value[0]);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    context.Result = ActionResultHelper.Error(ResultCode.DataException, "request.Form 获取表单数据异常");
-                    return;
-                }
-                var s = Strings.SignRequest(queryDic, secret);
-                if (Sign != s)
-                {
-                    context.Result = ActionResultHelper.Error(ResultCode.SignException, "未通过签名验证，请检查签名的参数和顺序是否正确");
-                    return;
-                }
-
+                PostExecuting(context, partner, queryDic);
             }
             else if (method == "GET")
             {
-                queryDic.Remove(RequestParameterNames.Sign);
-                var s = Strings.SignRequest(queryDic, secret);
-                if (Sign != s)
-                {
-                    context.Result = ActionResultHelper.Error(ResultCode.SignException, "未通过签名验证，请检查签名的参数和顺序是否正确");
-                    return;
-                }
+                GetExecuting(context, partner, queryDic);
             }
             else
             {
                 context.Result = ActionResultHelper.Error(ResultCode.RequestModeInvalid, "请求的模式不正确");
                 return;
             }
+            
+            UpdateHttpContextItems(context.HttpContext, queryDic);
+        }
+
+        /// <summary>
+        /// POST
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="partner"></param>
+        /// <param name="queryDic"></param>
+        private void PostExecuting(ActionExecutingContext context, Partner partner, IDictionary<string, string> queryDic)
+        {
+            var request = context.HttpContext.Request;
+
+            if (string.IsNullOrEmpty(partner.Sign))
+            {
+                context.Result = ActionResultHelper.Error(ResultCode.ParametersError, "必须参数Sign缺失");
+                return;
+            }
+
+            //采用协调世界时进行校验（接口请求时同样采用协调世界时处理）
+            if (partner.Timestamp.AddMinutes(5) < DateTime.Now.ToUniversalTime())
+            {
+                context.Result = ActionResultHelper.Error(ResultCode.RequestExpires, "API请求时间超时，服务过期，请检查Timestamp或同步服务器时间");
+                return;
+            }
+
+            if (partner.Authorize == null)
+            {
+                context.Result = ActionResultHelper.Error(ResultCode.GetModuleException, "模块授权信息不存在");
+                return;
+            }
+
+            queryDic.Remove(RequestParameterNames.Sign);
+            try
+            {
+                var data = request.Form;
+                var dic = new Dictionary<string, string>();
+                foreach (var item in data)
+                {
+                    if (!queryDic.ContainsKey(item.Key))
+                        queryDic.Add(item.Key, item.Value[0]);
+                }
+            }
+            catch (Exception ex)
+            {
+                //ex
+                context.Result = ActionResultHelper.Error(ResultCode.DataException, "request.Form 获取表单数据异常");
+                return;
+            }
+            var s = Strings.SignRequest(queryDic, partner.Authorize.AppSecret ?? string.Empty);
+            if (partner.Sign != s)
+            {
+                context.Result = ActionResultHelper.Error(ResultCode.SignException, "未通过签名验证，请检查签名的参数和顺序是否正确");
+                return;
+            }
 
             //是否有权限访问
-            bool powerSuccess = new Func<bool>(() =>
-            {
-                //不需要权限
-                if (Code <= 0) return true;
-
-                //访问的模块为Admin权限，通关
-                if (EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Admin)) return true;
-
-                //Use权限，且访问的模块拥有Editor或Use权限
-                if (EnumUtility.ContainsEnumItem((int)Code, Role.Use) && (EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Editor) || EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Use))) return true;
-
-                //Editor权限，且访问的模块拥有Editer权限
-                if (EnumUtility.ContainsEnumItem((int)Code, Role.Editor) && EnumUtility.ContainsEnumItem(moduleInfo.Role, Role.Editor)) return true;
-
-                return false;
-
-            }).Invoke();
+            bool powerSuccess = CheckModulePower(partner);
 
             //权限
             if (!powerSuccess)
@@ -153,8 +173,64 @@ namespace Td.Kylin.WebApi.Filters
                 context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed, "模块权限不足");
                 return;
             }
+        }
 
-            UpdateHttpContextItems(context.HttpContext, queryDic);
+        /// <summary>
+        /// GET
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="partner"></param>
+        /// <param name="queryDic"></param>
+        private void GetExecuting(ActionExecutingContext context, Partner partner, IDictionary<string, string> queryDic)
+        {
+            //如果为编辑权限或管理权限，则必须检测数字签名
+            if (Code == Role.Editor || Code == Role.Admin)
+            {
+                if (string.IsNullOrEmpty(partner.Sign))
+                {
+                    context.Result = ActionResultHelper.Error(ResultCode.ParametersError, "必须参数Sign缺失");
+                    return;
+                }
+
+                var s = Strings.SignRequest(queryDic, partner.Authorize.AppSecret);
+                if (partner.Sign != s)
+                {
+                    context.Result = ActionResultHelper.Error(ResultCode.SignException, "未通过签名验证，请检查签名的参数和顺序是否正确");
+                    return;
+                }
+            }
+
+            //是否有权限访问
+            bool powerSuccess = CheckModulePower(partner);
+
+            //权限
+            if (!powerSuccess)
+            {
+                context.Result = ActionResultHelper.Error(ResultCode.AuthorizationFailed, "模块权限不足");
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 检测合作者权限
+        /// </summary>
+        /// <param name="partner"></param>
+        /// <returns></returns>
+        private bool CheckModulePower(Partner partner)
+        {
+            //不需要权限
+            if (Code <= 0) return true;
+
+            //访问的模块为Admin权限，通关
+            if (EnumUtility.ContainsEnumItem(partner.Authorize.Role, Role.Admin)) return true;
+
+            //Use权限，且访问的模块拥有Editor或Use权限
+            if (EnumUtility.ContainsEnumItem((int)Code, Role.Use) && (EnumUtility.ContainsEnumItem(partner.Authorize.Role, Role.Editor) || EnumUtility.ContainsEnumItem(partner.Authorize.Role, Role.Use))) return true;
+
+            //Editor权限，且访问的模块拥有Editer权限
+            if (EnumUtility.ContainsEnumItem((int)Code, Role.Editor) && EnumUtility.ContainsEnumItem(partner.Authorize.Role, Role.Editor)) return true;
+
+            return false;
         }
 
         /// <summary>

@@ -65,7 +65,7 @@ namespace Td.Kylin.WebApi
                 Content = content
             };
 
-            string data = JsonConvert.SerializeObject(apiResult, Formatting.Indented, Settings.SerializerSettings);
+            string data = JsonConvert.SerializeObject(apiResult, Formatting.None, Settings.SerializerSettings);
 
             var result = new OkObjectResult("api");
             result.Value = data;
